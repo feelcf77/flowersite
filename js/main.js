@@ -1,4 +1,7 @@
 (function () {
+  // ===== Config: 改成你自己的 SendKey =====
+  var SENDKEY = 'YOUR_SENDKEY';
+
   // ===== Order Form =====
   var form = document.getElementById('orderForm');
   var success = document.getElementById('formSuccess');
@@ -34,20 +37,35 @@
         return;
       }
 
-      // Post to Formspree
-      var url = form.getAttribute('action');
+      // Build push message
+      var title = '新订单：' + data.company + ' · ' + data.package;
+      var desp = [
+        '**公司**：' + data.company,
+        '**联系人**：' + data.contactName,
+        '**手机**：' + data.phone,
+        '**地址**：' + (data.address || '未填'),
+        '**套餐**：' + data.package,
+        '**备注**：' + (data.note || '无'),
+        '',
+        '---',
+        '[' + new Date().toLocaleString('zh-CN') + ']'
+      ].join('\n\n');
+
+      // Post to Server酱
+      var url = 'https://sctapi.ftqq.com/' + SENDKEY + '.send';
       fetch(url, {
         method: 'POST',
-        headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: title, desp: desp })
       })
-      .then(function (res) {
-        if (res.ok) {
+      .then(function (res) { return res.json(); })
+      .then(function (json) {
+        if (json.code === 0) {
           form.style.display = 'none';
           success.style.display = 'block';
           success.scrollIntoView({ behavior: 'smooth', block: 'center' });
         } else {
-          return res.json().then(function (err) { throw err; });
+          throw new Error(json.info || '发送失败');
         }
       })
       .catch(function () {
