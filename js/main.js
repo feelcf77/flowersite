@@ -1,6 +1,6 @@
 (function () {
   // ===== Config: 改成你自己的 SendKey =====
-  var SENDKEY = 'YOUR_SENDKEY';
+  var SENDKEY = 'SCT361668TypM6Fz69RRhcB9Xvvl1fXJsn';
 
   // ===== Order Form =====
   var form = document.getElementById('orderForm');
