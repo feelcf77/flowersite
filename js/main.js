@@ -12,13 +12,11 @@
       btn.textContent = '提交中……';
 
       var data = {
-        package: form.querySelector('input[name="package"]:checked')
-          ? form.querySelector('input[name="package"]:checked').value
-          : '未选套餐',
         company: form.querySelector('#company').value.trim(),
         contactName: form.querySelector('#contactName').value.trim(),
         phone: form.querySelector('#phone').value.trim(),
         address: form.querySelector('#address').value.trim(),
+        package: form.querySelector('#package').value,
         note: form.querySelector('#note').value.trim(),
         time: new Date().toLocaleString('zh-CN')
       };
@@ -56,7 +54,6 @@
   var qrClose = document.getElementById('qrModalClose');
   var qrMask = qrModal ? qrModal.querySelector('.qr-modal-mask') : null;
 
-  // Show tip on load, auto-hide
   if (floatBtn) {
     setTimeout(function () {
       floatTip.classList.add('show');
@@ -65,14 +62,12 @@
       floatTip.classList.remove('show');
     }, 7000);
 
-    // Click float button → show QR modal
     floatBtn.addEventListener('click', function () {
       floatTip.classList.remove('show');
       qrModal.classList.add('show');
     });
   }
 
-  // Click tip → show QR modal
   if (floatTip) {
     floatTip.addEventListener('click', function (e) {
       e.stopPropagation();
@@ -81,7 +76,6 @@
     });
   }
 
-  // Close modal
   if (qrClose) {
     qrClose.addEventListener('click', function () {
       qrModal.classList.remove('show');
@@ -93,7 +87,6 @@
     });
   }
 
-  // Click any "weixin://" link → show QR modal instead
   document.addEventListener('click', function (e) {
     var target = e.target.closest('a[href="weixin://"]');
     if (target) {

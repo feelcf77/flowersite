@@ -89,17 +89,6 @@
   <h2 class="section-title">在线下单</h2>
   <p class="section-desc">填一下基本信息，30 分钟内给你出方案和报价</p>
   <form class="order-form" id="orderForm">
-    <div class="form-group">
-      <label class="form-label">选套餐 <span class="form-optional">（可选，不确定就跳过）</span></label>
-      <div class="pkg-select">
-        <label class="pkg-radio"><input type="radio" name="package" value="起步款 300元/月" /><span>起步款</span><small>17盆·¥300</small></label>
-        <label class="pkg-radio"><input type="radio" name="package" value="实惠款 360元/月" /><span>实惠款</span><small>20盆·¥360</small></label>
-        <label class="pkg-radio"><input type="radio" name="package" value="标准款 460元/月" /><span>标准款</span><small>25盆·¥460</small></label>
-        <label class="pkg-radio"><input type="radio" name="package" value="大户款 560元/月" /><span>大户款</span><small>33盆·¥560</small></label>
-        <label class="pkg-radio"><input type="radio" name="package" value="顶配款 860元/月" /><span>顶配款</span><small>50盆·¥860</small></label>
-        <label class="pkg-radio"><input type="radio" name="package" value="定制" /><span>不确定，要定制</span><small>发图单独报价</small></label>
-      </div>
-    </div>
     <div class="form-row">
       <div class="form-group">
         <label class="form-label" for="company">公司名称 <span class="form-required">*</span></label>
@@ -120,9 +109,23 @@
         <input type="text" id="address" name="address" class="form-input" placeholder="哪个区哪栋楼" />
       </div>
     </div>
-    <div class="form-group">
-      <label class="form-label" for="note">补充说明</label>
-      <textarea id="note" name="note" class="form-input form-textarea" rows="3" placeholder="有什么特殊要求、大概面积、想要什么风格……随便写"></textarea>
+    <div class="form-row form-row--3">
+      <div class="form-group">
+        <label class="form-label" for="package">意向套餐</label>
+        <select id="package" name="package" class="form-input form-select">
+          <option value="">先不选，等推荐</option>
+          <option value="起步款 300元/月">起步款 17盆 ¥300/月</option>
+          <option value="实惠款 360元/月">实惠款 20盆 ¥360/月</option>
+          <option value="标准款 460元/月">标准款 25盆 ¥460/月</option>
+          <option value="大户款 560元/月">大户款 33盆 ¥560/月</option>
+          <option value="顶配款 860元/月">顶配款 50盆 ¥860/月</option>
+          <option value="定制">定制 / 发图报价</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="note">备注</label>
+        <input type="text" id="note" name="note" class="form-input" placeholder="面积、风格、特殊要求" />
+      </div>
     </div>
     <button type="submit" class="btn btn-submit">提交，等方案</button>
     <p class="form-disclaimer">提交后 30 分钟内联系你，不骚扰、不群发</p>
