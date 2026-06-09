@@ -16,9 +16,8 @@
         contactName: form.querySelector('#contactName').value.trim(),
         phone: form.querySelector('#phone').value.trim(),
         address: form.querySelector('#address').value.trim(),
-        package: form.querySelector('#package').value,
-        note: form.querySelector('#note').value.trim(),
-        time: new Date().toLocaleString('zh-CN')
+        package: form.querySelector('#package').value || '未选',
+        note: form.querySelector('#note').value.trim()
       };
 
       if (!data.company || !data.contactName || !data.phone) {
@@ -35,15 +34,27 @@
         return;
       }
 
-      try {
-        var orders = JSON.parse(localStorage.getItem('hhsj_orders') || '[]');
-        orders.push(data);
-        localStorage.setItem('hhsj_orders', JSON.stringify(orders));
-      } catch (_) {}
-
-      form.style.display = 'none';
-      success.style.display = 'block';
-      success.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // Post to Formspree
+      var url = form.getAttribute('action');
+      fetch(url, {
+        method: 'POST',
+        headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      })
+      .then(function (res) {
+        if (res.ok) {
+          form.style.display = 'none';
+          success.style.display = 'block';
+          success.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else {
+          return res.json().then(function (err) { throw err; });
+        }
+      })
+      .catch(function () {
+        alert('网络不太好，提交失败。请直接打 13368445881 或加微信。');
+        btn.disabled = false;
+        btn.textContent = '提交，等方案';
+      });
     });
   }
 
