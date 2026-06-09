@@ -122,10 +122,10 @@ footer{background:#0f766e;color:rgba(255,255,255,.8);text-align:center;padding:1
 .success-hint{margin-top:.6rem;font-size:.8rem!important;color:#94a3b8!important}
 
 /* ===== QR Code ===== */
-.qr-img{display:block;margin:0 auto;border-radius:12px}
-.contact-card--qr .qr-img{width:90px;height:90px;margin-bottom:.2rem}
-.qr-img--sm{width:110px;height:110px;margin:.5rem auto}
-.qr-img--lg{width:170px;height:170px}
+.qr-img{display:block;margin:0 auto;border-radius:8px}
+.contact-card--qr .qr-img{width:100px;margin-bottom:.2rem}
+.qr-img--sm{width:120px;margin:.5rem auto}
+.qr-img--lg{width:200px}
 
 /* ===== WeChat Float ===== */
 .wx-float{position:fixed;bottom:22px;right:16px;z-index:9999;display:flex;flex-direction:column;align-items:flex-end;gap:.4rem}
