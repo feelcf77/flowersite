@@ -19,8 +19,9 @@
     <p class="tagline">办公室绿植租赁 & 养护一站式</p>
     <p class="subtitle">自有苗圃 · 包送包换 · 300 元/月起</p>
     <div class="hero-btns">
+      <a href="#order" class="btn btn-primary">免费出方案</a>
       <a href="tel:13368445881" class="btn btn-call">📞 直接打电话</a>
-      <a href="#contact" class="btn btn-wx">💬 微信同号</a>
+      <a href="#contact" class="btn btn-wx">💬 加微信</a>
     </div>
   </div>
 </header>
@@ -81,6 +82,58 @@
     </div>
   </div>
   <p class="section-desc" style="margin-top:1.5rem;font-size:.82rem;">更大面积 / 特殊需求？发图定制，单独报价</p>
+</section>
+
+<!-- 下单表单 -->
+<section class="section" id="order">
+  <h2 class="section-title">在线下单</h2>
+  <p class="section-desc">填一下基本信息，30 分钟内给你出方案和报价</p>
+  <form class="order-form" id="orderForm">
+    <div class="form-group">
+      <label class="form-label">选套餐 <span class="form-optional">（可选，不确定就跳过）</span></label>
+      <div class="pkg-select">
+        <label class="pkg-radio"><input type="radio" name="package" value="起步款 300元/月" /><span>起步款</span><small>17盆·¥300</small></label>
+        <label class="pkg-radio"><input type="radio" name="package" value="实惠款 360元/月" /><span>实惠款</span><small>20盆·¥360</small></label>
+        <label class="pkg-radio"><input type="radio" name="package" value="标准款 460元/月" /><span>标准款</span><small>25盆·¥460</small></label>
+        <label class="pkg-radio"><input type="radio" name="package" value="大户款 560元/月" /><span>大户款</span><small>33盆·¥560</small></label>
+        <label class="pkg-radio"><input type="radio" name="package" value="顶配款 860元/月" /><span>顶配款</span><small>50盆·¥860</small></label>
+        <label class="pkg-radio"><input type="radio" name="package" value="定制" /><span>不确定，要定制</span><small>发图单独报价</small></label>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label" for="company">公司名称 <span class="form-required">*</span></label>
+        <input type="text" id="company" name="company" class="form-input" placeholder="重庆XX有限公司" required />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="contactName">联系人 <span class="form-required">*</span></label>
+        <input type="text" id="contactName" name="contactName" class="form-input" placeholder="怎么称呼您" required />
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label" for="phone">手机号 <span class="form-required">*</span></label>
+        <input type="tel" id="phone" name="phone" class="form-input" placeholder="方便联系的手机号" required />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="address">办公地址</label>
+        <input type="text" id="address" name="address" class="form-input" placeholder="哪个区哪栋楼" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="note">补充说明</label>
+      <textarea id="note" name="note" class="form-input form-textarea" rows="3" placeholder="有什么特殊要求、大概面积、想要什么风格……随便写"></textarea>
+    </div>
+    <button type="submit" class="btn btn-submit">提交，等方案</button>
+    <p class="form-disclaimer">提交后 30 分钟内联系你，不骚扰、不群发</p>
+  </form>
+  <div class="form-success" id="formSuccess" style="display:none">
+    <div class="success-icon">✅</div>
+    <h3>收到，马上安排</h3>
+    <p>30 分钟内用 <strong>13368445881</strong> 联系你</p>
+    <img src="img/wechat-qr.png" alt="微信扫码" class="qr-img qr-img--sm" loading="lazy" />
+    <p class="success-hint">扫码加微信，发几张办公室照片，方案出得更快</p>
+  </div>
 </section>
 
 <!-- 植物 -->
@@ -158,11 +211,11 @@
       <h3>电话</h3>
       <p>13368445881</p>
     </a>
-    <a href="weixin://" class="contact-card">
-      <div class="contact-icon">💬</div>
-      <h3>微信</h3>
+    <div class="contact-card contact-card--qr">
+      <img src="img/wechat-qr.png" alt="微信扫码添加" class="qr-img" loading="lazy" />
+      <h3>微信扫码</h3>
       <p>13368445881</p>
-    </a>
+    </div>
   </div>
   <p class="contact-note">服务时间 8:00-20:00 · 全年无休</p>
 </section>
@@ -171,6 +224,26 @@
   <p>© 2026 渝中区花花世界鲜花经营店</p>
   <p>重庆办公室绿植租赁 · 养护 · 造景</p>
 </footer>
+
+<!-- 微信浮窗 + 扫码弹窗 -->
+<div class="wx-float" id="wxFloat">
+  <button class="wx-float-btn" id="wxFloatBtn" aria-label="微信咨询">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M8.691 2.188C3.891 2.188 0 5.476 0 9.53c0 2.212 1.17 4.203 3.002 5.55a.59.59 0 0 1 .213.665l-.39 1.48c-.019.07-.048.141-.048.213 0 .163.13.295.29.295a.328.328 0 0 0 .167-.054l1.903-1.114a.864.864 0 0 1 .717-.098 10.16 10.16 0 0 0 2.837.403c.276 0 .543-.027.811-.05-.857-2.578.157-4.972 1.932-6.446 1.703-1.415 3.882-1.98 5.853-1.838-.576-3.583-4.196-6.348-8.596-6.348zM5.785 5.991c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 0 1-1.162 1.178A1.17 1.17 0 0 1 4.623 7.17c0-.651.52-1.18 1.162-1.18zm5.813 0c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 0 1-1.162 1.178 1.17 1.17 0 0 1-1.162-1.178c0-.651.52-1.18 1.162-1.18zm5.34 2.867c-3.066-.016-5.619 2.38-5.619 5.368 0 2.573 1.86 4.764 4.348 5.263a4.59 4.59 0 0 0 .695.095c.638 0 1.267-.118 1.877-.354l1.22.735a.227.227 0 0 0 .117.037c.12 0 .22-.098.22-.218a.373.373 0 0 0-.035-.16l-.285-.975a.824.824 0 0 1 .155-.773c.956-1.142 1.526-2.504 1.526-3.98 0-3.017-2.619-5.027-6.214-5.028v-.002zm-2.018 2.359c.428 0 .775.358.775.8 0 .44-.347.797-.775.797s-.775-.357-.775-.797c0-.442.347-.8.775-.8zm4.204 0c.428 0 .775.358.775.8 0 .44-.347.797-.775.797s-.775-.357-.775-.797c0-.442.347-.8.775-.8z"/></svg>
+  </button>
+  <div class="wx-float-tip" id="wxFloatTip">扫码加微信<br />免费出方案</div>
+</div>
+
+<!-- 扫码弹窗 -->
+<div class="qr-modal" id="qrModal">
+  <div class="qr-modal-mask"></div>
+  <div class="qr-modal-body">
+    <button class="qr-modal-close" id="qrModalClose">&times;</button>
+    <h3>扫码加微信</h3>
+    <img src="img/wechat-qr.png" alt="微信扫码" class="qr-img qr-img--lg" />
+    <p>微信号：13368445881</p>
+    <p class="qr-modal-hint">长按保存图片 → 微信扫一扫</p>
+  </div>
+</div>
 
 <script src="js/main.js"></script>
 </body>
