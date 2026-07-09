@@ -1,0 +1,1372 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>伟盟到店线索增长中枢 Demo</title>
+  <style>
+    * { box-sizing: border-box; }
+    :root {
+      --bg: #f5f7f8;
+      --surface: #ffffff;
+      --surface-2: #eef3f4;
+      --line: #d8e1e4;
+      --line-strong: #b8c7cc;
+      --text: #172126;
+      --muted: #637278;
+      --soft: #87959a;
+      --accent: #0f6b5f;
+      --accent-2: #b8462f;
+      --accent-soft: #e4f1ee;
+      --warn-soft: #fff2df;
+      --danger-soft: #f9e4df;
+      --blue-soft: #e7eef8;
+      --shadow: 0 18px 50px rgba(40, 63, 70, .10);
+      --radius: 8px;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans SC", Arial, sans-serif;
+      letter-spacing: 0;
+      overflow-x: hidden;
+    }
+
+    button, input, select, textarea {
+      font: inherit;
+      letter-spacing: 0;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    .app {
+      min-height: 100dvh;
+      display: grid;
+      grid-template-columns: 252px minmax(0, 1fr);
+    }
+
+    .sidebar {
+      background: #12252b;
+      color: #f7fbfb;
+      padding: 22px 18px;
+      position: sticky;
+      top: 0;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-height: 48px;
+    }
+
+    .brand-mark {
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius);
+      background: #e9f4f1;
+      color: #10292e;
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+    }
+
+    .brand strong {
+      display: block;
+      font-size: 16px;
+      line-height: 1.2;
+    }
+
+    .brand span {
+      display: block;
+      color: #a8bbbf;
+      font-size: 12px;
+      margin-top: 3px;
+    }
+
+    .client-switch {
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      border-radius: var(--radius);
+      padding: 12px;
+    }
+
+    .client-switch label {
+      display: block;
+      color: #a8bbbf;
+      font-size: 12px;
+      margin-bottom: 8px;
+    }
+
+    .client-switch select {
+      width: 100%;
+      color: #f7fbfb;
+      background: #18343b;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: var(--radius);
+      padding: 9px 10px;
+      outline: none;
+    }
+
+    .nav {
+      display: grid;
+      gap: 6px;
+    }
+
+    .nav button {
+      color: #dbe7e8;
+      background: transparent;
+      min-height: 42px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 12px;
+      border-radius: var(--radius);
+      text-align: left;
+    }
+
+    .nav button:hover,
+    .nav button.active {
+      background: #e9f4f1;
+      color: #10292e;
+    }
+
+    .nav svg,
+    .btn svg,
+    .icon-button svg {
+      width: 18px;
+      height: 18px;
+      stroke-width: 1.8;
+      flex: 0 0 auto;
+    }
+
+    .side-note {
+      margin-top: auto;
+      border-top: 1px solid rgba(255,255,255,.12);
+      padding-top: 16px;
+      color: #a8bbbf;
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    main {
+      min-width: 0;
+      padding: 18px 22px 30px;
+    }
+
+    h1, h2, h3, p, span, strong, small, button, label, td, th {
+      overflow-wrap: anywhere;
+    }
+
+    .topbar {
+      min-height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .page-title h1 {
+      margin: 0;
+      font-size: 24px;
+      line-height: 1.2;
+    }
+
+    .page-title p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .btn, .icon-button {
+      min-height: 38px;
+      border-radius: var(--radius);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      white-space: nowrap;
+      transition: transform .14s ease, background .14s ease;
+    }
+
+    .btn:active, .icon-button:active {
+      transform: translateY(1px);
+    }
+
+    .btn {
+      padding: 0 13px;
+      background: #10292e;
+      color: #fff;
+    }
+
+    .btn.secondary {
+      background: #fff;
+      color: var(--text);
+      border: 1px solid var(--line);
+    }
+
+    .btn.accent {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .icon-button {
+      width: 38px;
+      background: #fff;
+      color: var(--text);
+      border: 1px solid var(--line);
+    }
+
+    .grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .grid.dashboard {
+      grid-template-columns: minmax(0, 1.45fr) minmax(320px, .8fr);
+      align-items: start;
+    }
+
+    .grid.two {
+      grid-template-columns: minmax(0, 1fr) minmax(340px, .65fr);
+      align-items: start;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .metric {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 14px;
+      min-height: 102px;
+    }
+
+    .metric span {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 12px;
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 30px;
+      line-height: 1;
+    }
+
+    .metric small {
+      display: block;
+      color: var(--soft);
+      font-size: 12px;
+      margin-top: 8px;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      min-width: 0;
+    }
+
+    .panel.flush {
+      box-shadow: none;
+    }
+
+    .panel-head {
+      min-height: 56px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .panel-head h2 {
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.2;
+    }
+
+    .panel-head p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .panel-body {
+      padding: 16px;
+    }
+
+    .hero-board {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 260px;
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .hero-copy {
+      min-width: 0;
+      min-height: 270px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 18px;
+      border-radius: var(--radius);
+      background:
+        linear-gradient(135deg, rgba(15,107,95,.12), rgba(184,70,47,.08)),
+        #f8fbfb;
+      border: 1px solid var(--line);
+    }
+
+    .hero-copy h2 {
+      margin: 0;
+      font-size: 28px;
+      line-height: 1.25;
+      max-width: 640px;
+    }
+
+    .hero-copy p {
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 68ch;
+      margin: 12px 0 0;
+      font-size: 14px;
+    }
+
+    .hero-flow {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 20px;
+    }
+
+    .flow-step {
+      min-height: 58px;
+      border-radius: var(--radius);
+      background: rgba(255,255,255,.78);
+      border: 1px solid var(--line);
+      padding: 10px;
+      color: #26343a;
+      font-size: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .flow-step strong {
+      color: var(--accent);
+      font-size: 13px;
+    }
+
+    .garage-image {
+      min-width: 0;
+      min-height: 270px;
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--line);
+      background: #dce5e7;
+      position: relative;
+    }
+
+    .garage-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      filter: saturate(.9) contrast(1.02);
+    }
+
+    .garage-image::after {
+      content: "样板客户: 伟盟路捷";
+      position: absolute;
+      left: 12px;
+      bottom: 12px;
+      background: rgba(18,37,43,.82);
+      color: #fff;
+      border-radius: var(--radius);
+      padding: 8px 10px;
+      font-size: 12px;
+    }
+
+    .funnel {
+      display: grid;
+      gap: 10px;
+    }
+
+    .funnel-row {
+      display: grid;
+      grid-template-columns: 96px minmax(0, 1fr) 52px;
+      gap: 10px;
+      align-items: center;
+      min-height: 38px;
+    }
+
+    .bar {
+      height: 12px;
+      border-radius: 999px;
+      background: var(--surface-2);
+      overflow: hidden;
+    }
+
+    .bar span {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: var(--accent);
+    }
+
+    .funnel-row label,
+    .funnel-row strong {
+      font-size: 13px;
+    }
+
+    .source-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .source-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 12px;
+      min-height: 96px;
+      background: #fff;
+    }
+
+    .source-card h3 {
+      margin: 0 0 8px;
+      font-size: 14px;
+    }
+
+    .source-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .filters {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .filters select,
+    .filters input,
+    .form-grid input,
+    .form-grid select,
+    .form-grid textarea {
+      min-height: 38px;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--text);
+      padding: 0 10px;
+      outline: none;
+      min-width: 150px;
+    }
+
+    .form-grid textarea {
+      min-height: 74px;
+      padding: 10px;
+      resize: vertical;
+    }
+
+    .filters input {
+      min-width: 230px;
+    }
+
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      min-width: 860px;
+    }
+
+    th, td {
+      border-bottom: 1px solid var(--line);
+      padding: 12px 10px;
+      text-align: left;
+      vertical-align: top;
+      font-size: 13px;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 12px;
+      background: #f8fafb;
+      font-weight: 700;
+    }
+
+    tbody tr:hover {
+      background: #f8fbfb;
+    }
+
+    .status,
+    .grade {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 62px;
+      min-height: 24px;
+      border-radius: var(--radius);
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .grade.a { color: #07564d; background: var(--accent-soft); }
+    .grade.b { color: #6e4611; background: var(--warn-soft); }
+    .grade.c { color: #31537d; background: var(--blue-soft); }
+    .status.new { color: #07564d; background: var(--accent-soft); }
+    .status.follow { color: #31537d; background: var(--blue-soft); }
+    .status.booked { color: #6e4611; background: var(--warn-soft); }
+    .status.done { color: #7c2f1f; background: var(--danger-soft); }
+
+    .mini-action {
+      background: transparent;
+      color: var(--accent);
+      padding: 0;
+      min-height: 24px;
+      font-weight: 700;
+    }
+
+    .phone-shell {
+      width: min(100%, 340px);
+      margin: 0 auto;
+      background: #12252b;
+      border-radius: 28px;
+      padding: 12px;
+      box-shadow: 0 18px 55px rgba(18,37,43,.18);
+    }
+
+    .phone-screen {
+      background: #f7fafb;
+      border-radius: 20px;
+      min-height: 610px;
+      overflow: hidden;
+    }
+
+    .phone-hero {
+      min-height: 164px;
+      background:
+        linear-gradient(rgba(18,37,43,.20), rgba(18,37,43,.76)),
+        url("assets/garage-demo.jpg") center/cover;
+      color: #fff;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+
+    .phone-hero h2 {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.2;
+    }
+
+    .phone-hero p {
+      margin: 8px 0 0;
+      font-size: 12px;
+      color: rgba(255,255,255,.82);
+      line-height: 1.6;
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 10px;
+    }
+
+    .phone-screen .form-grid {
+      padding: 14px;
+    }
+
+    .form-grid label {
+      display: grid;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .form-grid button {
+      margin-top: 4px;
+      min-height: 42px;
+      border-radius: var(--radius);
+      background: var(--accent);
+      color: #fff;
+      font-weight: 800;
+    }
+
+    .channel-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .channel-row {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 12px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+      background: #fff;
+    }
+
+    .channel-row h3 {
+      margin: 0;
+      font-size: 14px;
+    }
+
+    .channel-row p {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .qr {
+      width: 58px;
+      height: 58px;
+      border-radius: var(--radius);
+      border: 1px solid var(--line-strong);
+      background:
+        linear-gradient(90deg, #10292e 6px, transparent 6px) 0 0/14px 14px,
+        linear-gradient(#10292e 6px, transparent 6px) 0 0/14px 14px,
+        #fff;
+    }
+
+    .faq-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .faq-item {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      overflow: hidden;
+    }
+
+    .faq-item button {
+      width: 100%;
+      min-height: 48px;
+      background: #fff;
+      color: var(--text);
+      padding: 0 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      text-align: left;
+      font-weight: 700;
+    }
+
+    .faq-item p {
+      display: none;
+      margin: 0;
+      padding: 0 14px 14px;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 13px;
+    }
+
+    .faq-item.open p {
+      display: block;
+    }
+
+    .recall-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .recall-item {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 12px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: start;
+      background: #fff;
+    }
+
+    .recall-item h3 {
+      margin: 0 0 6px;
+      font-size: 14px;
+    }
+
+    .recall-item p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .priority {
+      min-width: 70px;
+      min-height: 28px;
+      border-radius: var(--radius);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--warn-soft);
+      color: #6e4611;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .view { display: none; }
+    .view.active { display: block; }
+
+    .toast {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      max-width: min(360px, calc(100vw - 40px));
+      background: #10292e;
+      color: #fff;
+      padding: 12px 14px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      font-size: 13px;
+      transform: translateY(18px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .16s ease, transform .16s ease;
+      z-index: 20;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    @media (max-width: 1180px) {
+      .grid.dashboard,
+      .grid.two,
+      .hero-board {
+        grid-template-columns: 1fr;
+      }
+      .garage-image {
+        min-height: 220px;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+      .sidebar {
+        position: static;
+        height: auto;
+        padding: 14px;
+      }
+      .brand,
+      .client-switch,
+      .side-note {
+        display: none;
+      }
+      .nav {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 8px;
+      }
+      .nav button {
+        justify-content: center;
+        padding: 0 8px;
+      }
+      .nav button span {
+        display: none;
+      }
+      main {
+        padding: 14px;
+      }
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+      .top-actions {
+        justify-content: flex-start;
+      }
+      .metrics,
+      .source-grid,
+      .hero-flow {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 560px) {
+      .app,
+      .sidebar,
+      main,
+      .panel,
+      .panel-body,
+      .hero-board,
+      .hero-copy {
+        max-width: 100vw;
+      }
+      .panel-body {
+        padding: 12px;
+      }
+      .page-title h1 {
+        font-size: 20px;
+        line-height: 1.32;
+        max-width: calc(100vw - 28px);
+        word-break: break-all;
+      }
+      .page-title p {
+        font-size: 12px;
+        line-height: 1.6;
+        max-width: calc(100vw - 28px);
+        word-break: break-all;
+      }
+      .metrics,
+      .source-grid,
+      .hero-flow {
+        grid-template-columns: 1fr;
+      }
+      .hero-copy h2 {
+        font-size: 20px;
+        line-height: 1.35;
+        max-width: min(280px, calc(100vw - 92px));
+        word-break: break-all;
+      }
+      .hero-copy {
+        padding: 14px;
+      }
+      .hero-copy p {
+        max-width: min(280px, calc(100vw - 92px));
+        word-break: break-all;
+      }
+      .top-actions {
+        width: 100%;
+      }
+      .filters input,
+      .filters select,
+      .btn {
+        width: 100%;
+      }
+      .panel-head {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+      .channel-row,
+      .recall-item {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">增</div>
+        <div>
+          <strong>到店线索增长中枢</strong>
+          <span>MVP 演示环境</span>
+        </div>
+      </div>
+
+      <div class="client-switch">
+        <label for="client">当前样板客户</label>
+        <select id="client">
+          <option>伟盟路捷 · 捷豹路虎专修</option>
+          <option>豪车专修门店 · 演示客户</option>
+          <option>二手车检测门店 · 演示客户</option>
+        </select>
+      </div>
+
+      <nav class="nav" aria-label="主导航">
+        <button class="active" data-view="overview"><i data-lucide="layout-dashboard"></i><span>经营总览</span></button>
+        <button data-view="leads"><i data-lucide="list-filter"></i><span>线索看板</span></button>
+        <button data-view="booking"><i data-lucide="smartphone"></i><span>预约入口</span></button>
+        <button data-view="faq"><i data-lucide="messages-square"></i><span>AI 问答库</span></button>
+        <button data-view="recall"><i data-lucide="rotate-ccw"></i><span>老客召回</span></button>
+      </nav>
+
+      <div class="side-note">
+        演示数据用于沟通交付边界。正式开工后替换为门店真实渠道、真实客户和真实转化数据。
+      </div>
+    </aside>
+
+    <main>
+      <header class="topbar">
+        <div class="page-title">
+          <h1>伟盟路捷 45 天到店线索增长样板</h1>
+          <p>把抖音、微信、地图、门店二维码和老客户统一接入同一条跟进链路。</p>
+        </div>
+        <div class="top-actions">
+          <button class="icon-button" title="刷新演示数据"><i data-lucide="refresh-cw"></i></button>
+          <button class="btn secondary"><i data-lucide="file-down"></i>导出周报</button>
+          <button class="btn accent" id="demoSubmit"><i data-lucide="plus"></i>模拟新增线索</button>
+        </div>
+      </header>
+
+      <section class="view active" id="overview">
+        <div class="metrics">
+          <div class="metric">
+            <span>本周新增<i data-lucide="trending-up"></i></span>
+            <strong id="metricLeads">86</strong>
+            <small>较上周增加 18 条</small>
+          </div>
+          <div class="metric">
+            <span>已预约<i data-lucide="calendar-check"></i></span>
+            <strong>31</strong>
+            <small>预约率 36.0%</small>
+          </div>
+          <div class="metric">
+            <span>已到店<i data-lucide="map-pin-check"></i></span>
+            <strong>22</strong>
+            <small>到店率 25.6%</small>
+          </div>
+          <div class="metric">
+            <span>预估成交<i data-lucide="receipt-text"></i></span>
+            <strong>¥42k</strong>
+            <small>按已报价项目估算</small>
+          </div>
+        </div>
+
+        <div class="grid dashboard">
+          <div class="panel">
+            <div class="panel-body">
+              <div class="hero-board">
+                <div class="hero-copy">
+                  <div>
+                    <h2>不是再做一个系统，而是把已经存在的咨询接到门店里。</h2>
+                    <p>样板版本先覆盖线索进入、分级、跟进、预约、到店和复盘。伟盟签约后，这套页面可以直接替换真实门店资料和渠道链接。</p>
+                  </div>
+                  <div class="hero-flow">
+                    <div class="flow-step"><strong>入口</strong><span>抖音/微信/地图</span></div>
+                    <div class="flow-step"><strong>留资</strong><span>车型/问题/门店</span></div>
+                    <div class="flow-step"><strong>分级</strong><span>A/B/C 意向</span></div>
+                    <div class="flow-step"><strong>跟进</strong><span>报价/预约/提醒</span></div>
+                    <div class="flow-step"><strong>复盘</strong><span>渠道和成交</span></div>
+                  </div>
+                </div>
+                <div class="garage-image" aria-label="汽修场景图片">
+                  <img src="assets/garage-demo.jpg" alt="汽车维修车间场景" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <h2>转化漏斗</h2>
+                <p>演示周期: 2026-07-01 至 2026-07-07</p>
+              </div>
+            </div>
+            <div class="panel-body">
+              <div class="funnel">
+                <div class="funnel-row"><label>新线索</label><div class="bar"><span style="width:100%"></span></div><strong>86</strong></div>
+                <div class="funnel-row"><label>已联系</label><div class="bar"><span style="width:72%"></span></div><strong>62</strong></div>
+                <div class="funnel-row"><label>已报价</label><div class="bar"><span style="width:48%"></span></div><strong>41</strong></div>
+                <div class="funnel-row"><label>已预约</label><div class="bar"><span style="width:36%"></span></div><strong>31</strong></div>
+                <div class="funnel-row"><label>已到店</label><div class="bar"><span style="width:26%"></span></div><strong>22</strong></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel flush" style="margin-top:14px">
+          <div class="panel-head">
+            <div>
+              <h2>渠道表现</h2>
+              <p>每个入口使用独立链接或二维码，后续能看清楚哪条渠道带来到店。</p>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="source-grid">
+              <div class="source-card"><h3>抖音主页</h3><p>31 条线索，12 个预约。适合承接评论、私信和置顶视频流量。</p></div>
+              <div class="source-card"><h3>老客户召回</h3><p>22 条线索，11 个预约。适合保养到期、复查和换季检测。</p></div>
+              <div class="source-card"><h3>地图/点评</h3><p>14 条线索，5 个预约。适合附近搜索和门店口碑转化。</p></div>
+              <div class="source-card"><h3>门店二维码</h3><p>9 条线索，2 个预约。适合线下活动和到店复访。</p></div>
+              <div class="source-card"><h3>合作方推荐</h3><p>7 条线索，1 个预约。适合二手车商、救援、洗美渠道。</p></div>
+              <div class="source-card"><h3>小红书搜索</h3><p>3 条线索，暂未预约。适合价格透明和避坑内容沉淀。</p></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="leads">
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>线索看板</h2>
+              <p>老板、店长和客服看到同一张表，减少漏跟进和口头传递。</p>
+            </div>
+            <div class="filters">
+              <input id="leadSearch" type="search" placeholder="搜索车型、问题、客户" />
+              <select id="statusFilter">
+                <option value="all">全部状态</option>
+                <option value="新线索">新线索</option>
+                <option value="已联系">已联系</option>
+                <option value="已预约">已预约</option>
+                <option value="已到店">已到店</option>
+              </select>
+              <select id="sourceFilter">
+                <option value="all">全部来源</option>
+                <option value="抖音">抖音</option>
+                <option value="老客户">老客户</option>
+                <option value="地图">地图</option>
+                <option value="门店二维码">门店二维码</option>
+              </select>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>客户</th>
+                  <th>车型/问题</th>
+                  <th>来源</th>
+                  <th>门店</th>
+                  <th>等级</th>
+                  <th>状态</th>
+                  <th>跟进记录</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="leadRows"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="booking">
+        <div class="grid two">
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <h2>预约入口配置</h2>
+                <p>不同渠道使用不同链接，统一进入线索表。</p>
+              </div>
+              <button class="btn secondary"><i data-lucide="copy"></i>复制演示链接</button>
+            </div>
+            <div class="panel-body">
+              <div class="channel-list">
+                <div class="channel-row">
+                  <div><h3>抖音主页预约</h3><p>/book/weimeng?source=douyin_profile，用于主页、置顶视频和评论回复。</p></div>
+                  <div class="qr" aria-label="抖音预约二维码示意"></div>
+                </div>
+                <div class="channel-row">
+                  <div><h3>门店前台二维码</h3><p>/book/weimeng?source=store_qr，用于到店复查、朋友推荐和活动登记。</p></div>
+                  <div class="qr" aria-label="门店二维码示意"></div>
+                </div>
+                <div class="channel-row">
+                  <div><h3>老客户召回链接</h3><p>/book/weimeng?source=old_customer，用于客服回访后的预约确认。</p></div>
+                  <div class="qr" aria-label="老客户召回二维码示意"></div>
+                </div>
+                <div class="channel-row">
+                  <div><h3>合作方推荐码</h3><p>/book/weimeng?source=partner&code=car_dealer_01，用于二手车商和救援渠道。</p></div>
+                  <div class="qr" aria-label="合作方二维码示意"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="phone-shell">
+            <div class="phone-screen">
+              <div class="phone-hero">
+                <h2>伟盟路捷预约检测</h2>
+                <p>捷豹路虎常见故障、保养、二手车检测和到店报价预约。</p>
+              </div>
+              <form class="form-grid" id="bookingForm">
+                <label>车型
+                  <select>
+                    <option>路虎发现 4</option>
+                    <option>揽胜运动</option>
+                    <option>捷豹 XFL</option>
+                    <option>其他车型</option>
+                  </select>
+                </label>
+                <label>问题类型
+                  <select>
+                    <option>故障灯/故障码</option>
+                    <option>保养到期</option>
+                    <option>底盘异响</option>
+                    <option>二手车购买前检测</option>
+                  </select>
+                </label>
+                <label>希望到店门店
+                  <select>
+                    <option>金开大道店</option>
+                    <option>汽博中心店</option>
+                    <option>南坪店</option>
+                  </select>
+                </label>
+                <label>联系方式
+                  <input placeholder="手机号或微信" />
+                </label>
+                <label>补充说明
+                  <textarea placeholder="例如: 冷车抖动，最近油耗升高"></textarea>
+                </label>
+                <button type="submit">提交预约</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="faq">
+        <div class="grid two">
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <h2>AI 问答库样板</h2>
+                <p>只回答接待和预约相关内容，不替代技师诊断。</p>
+              </div>
+            </div>
+            <div class="panel-body">
+              <div class="faq-list">
+                <div class="faq-item open">
+                  <button type="button">揽胜运动小保养大概多少钱？<i data-lucide="chevron-down"></i></button>
+                  <p>不同年款和机油规格会影响价格。可以先按小保养、大保养、刹车油、变速箱油等项目给出区间，最终以到店检查和确认项目为准。</p>
+                </div>
+                <div class="faq-item">
+                  <button type="button">发动机故障灯亮了能不能继续开？<i data-lucide="chevron-down"></i></button>
+                  <p>如果车辆明显抖动、动力下降、异响或水温异常，建议不要继续长距离行驶。可以先预约读取故障码，再由技师判断具体原因。</p>
+                </div>
+                <div class="faq-item">
+                  <button type="button">二手路虎买之前可以检测吗？<i data-lucide="chevron-down"></i></button>
+                  <p>可以。检测重点包括发动机、变速箱、底盘、电子系统、维修痕迹和故障码。建议提前预约并确认车辆到店时间。</p>
+                </div>
+                <div class="faq-item">
+                  <button type="button">AI 不能回答哪些内容？<i data-lucide="chevron-down"></i></button>
+                  <p>不承诺故障结论，不承诺最终维修价格，不替代技师检测，不引导客户拆修。AI 只做初筛、解释、报价区间和预约引导。</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <h2>问答边界</h2>
+                <p>签约时可以作为交付边界的一部分。</p>
+              </div>
+            </div>
+            <div class="panel-body">
+              <div class="source-grid" style="grid-template-columns:1fr">
+                <div class="source-card"><h3>可以回答</h3><p>门店地址、营业时间、预约流程、服务项目、报价区间、常见故障解释、到店前准备。</p></div>
+                <div class="source-card"><h3>需要转人工</h3><p>明确报价、复杂故障判断、客户投诉、保险理赔、事故车争议、售后纠纷。</p></div>
+                <div class="source-card"><h3>必须留痕</h3><p>每次咨询都记录来源、车型、问题、联系方式、客服跟进人和下一步动作。</p></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="recall">
+        <div class="grid two">
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <h2>老客户召回任务</h2>
+                <p>先导入样本客户，按车型、上次到店时间和项目生成任务。</p>
+              </div>
+              <button class="btn secondary"><i data-lucide="upload"></i>导入 Excel</button>
+            </div>
+            <div class="panel-body">
+              <div class="recall-list">
+                <div class="recall-item">
+                  <div><h3>揽胜运动 · 上次保养 2025-12-18</h3><p>建议话术: 这周可安排老客户免费底盘和油液检查，确认是否需要保养。</p></div>
+                  <span class="priority">优先</span>
+                </div>
+                <div class="recall-item">
+                  <div><h3>发现 4 · 上次维修 2026-01-09</h3><p>建议话术: 上次处理过冷却系统问题，可以提醒客户做一次复查。</p></div>
+                  <span class="priority">复查</span>
+                </div>
+                <div class="recall-item">
+                  <div><h3>捷豹 XFL · 两年未到店</h3><p>建议话术: 邀请参加老客户检测日，降低重新激活门槛。</p></div>
+                  <span class="priority">唤醒</span>
+                </div>
+                <div class="recall-item">
+                  <div><h3>二手车商客户 · 本月推荐 3 台</h3><p>建议动作: 生成专属推荐码，按有效到店和成交做复盘。</p></div>
+                  <span class="priority">渠道</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <h2>召回数据</h2>
+                <p>给老板看的不是群发数量，而是预约和到店。</p>
+              </div>
+            </div>
+            <div class="panel-body">
+              <div class="metrics" style="grid-template-columns:repeat(2,minmax(0,1fr));margin-bottom:0">
+                <div class="metric"><span>待回访<i data-lucide="phone-call"></i></span><strong>128</strong><small>本周任务池</small></div>
+                <div class="metric"><span>已触达<i data-lucide="send"></i></span><strong>64</strong><small>含电话和微信</small></div>
+                <div class="metric"><span>已预约<i data-lucide="calendar-check"></i></span><strong>11</strong><small>预约率 17.2%</small></div>
+                <div class="metric"><span>已到店<i data-lucide="map-pin-check"></i></span><strong>7</strong><small>到店率 10.9%</small></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast">已写入演示线索，正式版本会进入数据库和跟进任务。</div>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script>
+    const leads = [
+      { name: "王先生", car: "路虎发现 4", issue: "冷车抖动，故障灯亮", source: "抖音", store: "金开大道店", grade: "A", status: "新线索", note: "今天可到店，待客服确认时间" },
+      { name: "刘女士", car: "揽胜运动", issue: "小保养和刹车片报价", source: "老客户", store: "汽博中心店", grade: "A", status: "已预约", note: "预约周六上午 10:30" },
+      { name: "陈先生", car: "捷豹 XFL", issue: "二手车购买前检测", source: "地图", store: "南坪店", grade: "B", status: "已联系", note: "需要卖家确认车辆时间" },
+      { name: "赵先生", car: "揽胜行政", issue: "底盘异响，想先问价格", source: "抖音", store: "金开大道店", grade: "B", status: "已联系", note: "已发检测流程和报价区间" },
+      { name: "周女士", car: "发现神行", issue: "保养到期提醒", source: "老客户", store: "汽博中心店", grade: "A", status: "已到店", note: "已完成检查，等待报价确认" },
+      { name: "杨先生", car: "路虎极光", issue: "变速箱顿挫咨询", source: "门店二维码", store: "南坪店", grade: "C", status: "新线索", note: "需补充年款和里程" },
+      { name: "何先生", car: "发现 5", issue: "高速前全车检查", source: "老客户", store: "金开大道店", grade: "B", status: "已预约", note: "预约明天下午" },
+      { name: "吴先生", car: "捷豹 F-PACE", issue: "发动机舱异响", source: "地图", store: "汽博中心店", grade: "A", status: "已联系", note: "建议先读取故障码" }
+    ];
+
+    const navButtons = document.querySelectorAll(".nav button");
+    const views = document.querySelectorAll(".view");
+    const rows = document.getElementById("leadRows");
+    const search = document.getElementById("leadSearch");
+    const statusFilter = document.getElementById("statusFilter");
+    const sourceFilter = document.getElementById("sourceFilter");
+    const toast = document.getElementById("toast");
+
+    function iconRefresh() {
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    function statusClass(status) {
+      if (status === "新线索") return "new";
+      if (status === "已联系") return "follow";
+      if (status === "已预约") return "booked";
+      return "done";
+    }
+
+    function gradeClass(grade) {
+      return grade.toLowerCase();
+    }
+
+    function renderLeads() {
+      const keyword = (search?.value || "").trim().toLowerCase();
+      const selectedStatus = statusFilter?.value || "all";
+      const selectedSource = sourceFilter?.value || "all";
+
+      const filtered = leads.filter((lead) => {
+        const text = `${lead.name} ${lead.car} ${lead.issue}`.toLowerCase();
+        const matchKeyword = !keyword || text.includes(keyword);
+        const matchStatus = selectedStatus === "all" || lead.status === selectedStatus;
+        const matchSource = selectedSource === "all" || lead.source === selectedSource;
+        return matchKeyword && matchStatus && matchSource;
+      });
+
+      rows.innerHTML = filtered.map((lead, index) => `
+        <tr>
+          <td><strong>${lead.name}</strong></td>
+          <td>${lead.car}<br><span style="color:var(--muted)">${lead.issue}</span></td>
+          <td>${lead.source}</td>
+          <td>${lead.store}</td>
+          <td><span class="grade ${gradeClass(lead.grade)}">${lead.grade} 类</span></td>
+          <td><span class="status ${statusClass(lead.status)}">${lead.status}</span></td>
+          <td>${lead.note}</td>
+          <td><button class="mini-action" data-index="${index}">推进状态</button></td>
+        </tr>
+      `).join("");
+
+      document.querySelectorAll(".mini-action").forEach((button) => {
+        button.addEventListener("click", () => showToast("演示操作: 正式版本会记录跟进人、时间和下一步任务。"));
+      });
+    }
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add("show");
+      window.clearTimeout(showToast.timer);
+      showToast.timer = window.setTimeout(() => toast.classList.remove("show"), 2200);
+    }
+
+    navButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        navButtons.forEach((item) => item.classList.remove("active"));
+        views.forEach((view) => view.classList.remove("active"));
+        button.classList.add("active");
+        document.getElementById(button.dataset.view).classList.add("active");
+      });
+    });
+
+    [search, statusFilter, sourceFilter].forEach((control) => {
+      if (control) control.addEventListener("input", renderLeads);
+    });
+
+    document.querySelectorAll(".faq-item button").forEach((button) => {
+      button.addEventListener("click", () => {
+        button.closest(".faq-item").classList.toggle("open");
+      });
+    });
+
+    document.getElementById("bookingForm").addEventListener("submit", (event) => {
+      event.preventDefault();
+      showToast("预约已提交到演示线索池。");
+    });
+
+    document.getElementById("demoSubmit").addEventListener("click", () => {
+      leads.unshift({
+        name: "新增客户",
+        car: "揽胜运动",
+        issue: "故障码读取预约",
+        source: "抖音",
+        store: "金开大道店",
+        grade: "A",
+        status: "新线索",
+        note: "演示新增，待客服 10 分钟内联系"
+      });
+      document.getElementById("metricLeads").textContent = String(Number(document.getElementById("metricLeads").textContent) + 1);
+      renderLeads();
+      showToast("已新增一条演示线索。");
+    });
+
+    renderLeads();
+    iconRefresh();
+  </script>
+</body>
+</html>
