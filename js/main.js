@@ -1,129 +1,294 @@
 (function () {
-  /* ==============================================
-     NOTE — SendKey 暴露在前端代码中。
-     正式上线建议通过 Cloudflare Worker / 腾讯云函数
-     做一层代理转发，避免 key 被滥用。
-  ============================================== */
-  var SENDKEY = 'SCT361668TypM6Fz69RRhcB9vXvl1fXJsn';
+  'use strict';
 
-  // ===== FAQ Accordion =====
-  var faqItems = document.querySelectorAll('.faq-item');
-  faqItems.forEach(function (item) {
-    var btn = item.querySelector('.faq-q');
-    if (!btn) return;
-    btn.addEventListener('click', function () {
-      var isOpen = item.classList.contains('open');
+  /* ==============================================
+     FAQ Accordion — aria-controls + hidden sync
+     ============================================== */
+  var faqList = document.querySelector('.faq-list');
+  if (faqList) {
+    faqList.addEventListener('click', function (e) {
+      var btn = e.target.closest('.faq-q');
+      if (!btn) return;
+
+      var isOpen = btn.getAttribute('aria-expanded') === 'true';
+      var panelId = btn.getAttribute('aria-controls');
+      var panel = panelId ? document.getElementById(panelId) : null;
+
       // close all
-      faqItems.forEach(function (el) {
-        el.classList.remove('open');
-        var q = el.querySelector('.faq-q');
-        if (q) q.setAttribute('aria-expanded', 'false');
+      var allBtns = faqList.querySelectorAll('.faq-q');
+      var allPanels = faqList.querySelectorAll('.faq-a');
+      allBtns.forEach(function (b) { b.setAttribute('aria-expanded', 'false'); });
+      allPanels.forEach(function (p) { p.hidden = true; });
+      allBtns.forEach(function (b) {
+        var item = b.closest('.faq-item');
+        if (item) item.classList.remove('open');
       });
-      // open current (unless it was already open)
+
+      // open clicked if it was closed
       if (!isOpen) {
-        item.classList.add('open');
         btn.setAttribute('aria-expanded', 'true');
+        if (panel) panel.hidden = false;
+        var item = btn.closest('.faq-item');
+        if (item) item.classList.add('open');
       }
     });
-  });
+  }
 
-  // ===== Order Form =====
+  /* ==============================================
+     QR Modal — accessible dialog with focus trap
+     ============================================== */
+  var qrModal = document.getElementById('qrModal');
+  var qrClose = document.getElementById('qrModalClose');
+  var qrMask = qrModal ? qrModal.querySelector('.qr-modal-mask') : null;
+  var lastFocus = null;
+
+  function openModal() {
+    if (!qrModal) return;
+    lastFocus = document.activeElement;
+    qrModal.hidden = false;
+    qrModal.classList.add('show');
+    // focus the close button
+    if (qrClose) qrClose.focus();
+    document.addEventListener('keydown', modalKeyHandler);
+  }
+
+  function closeModal() {
+    if (!qrModal) return;
+    qrModal.classList.remove('show');
+    qrModal.hidden = true;
+    document.removeEventListener('keydown', modalKeyHandler);
+    if (lastFocus && typeof lastFocus.focus === 'function') {
+      lastFocus.focus();
+      lastFocus = null;
+    }
+  }
+
+  function modalKeyHandler(e) {
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      closeModal();
+      return;
+    }
+    if (e.key === 'Tab') {
+      var body = qrModal.querySelector('.qr-modal-body');
+      var focusable = body.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      if (focusable.length === 0) return;
+      var first = focusable[0];
+      var last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+  }
+
+  if (qrClose) qrClose.addEventListener('click', closeModal);
+  if (qrMask) qrMask.addEventListener('click', closeModal);
+
+  /* ==============================================
+     WeChat Float Button
+     ============================================== */
+  var floatBtn = document.getElementById('wxFloatBtn');
+  var floatTip = document.getElementById('wxFloatTip');
+
+  if (floatBtn) {
+    floatBtn.addEventListener('click', openModal);
+  }
+
+  if (floatTip) {
+    setTimeout(function () { floatTip.classList.add('show'); }, 1200);
+    setTimeout(function () { floatTip.classList.remove('show'); }, 7000);
+    floatTip.addEventListener('click', function (e) {
+      e.stopPropagation();
+      floatTip.classList.remove('show');
+      openModal();
+    });
+  }
+
+  // Header WeChat button
+  var btnHeaderWechat = document.getElementById('btnWechatHeader');
+  if (btnHeaderWechat) {
+    btnHeaderWechat.addEventListener('click', openModal);
+  }
+
+  // Hero WeChat button
+  var btnHeroWechat = document.getElementById('btnHeroWechat');
+  if (btnHeroWechat) {
+    btnHeroWechat.addEventListener('click', openModal);
+  }
+
+  /* ==============================================
+     Order Form — client-side only, no remote send
+     ============================================== */
   var form = document.getElementById('orderForm');
-  var success = document.getElementById('formSuccess');
+  var formResult = document.getElementById('formResult');
+  var resultText = document.getElementById('resultText');
+  var btnCopy = document.getElementById('btnCopy');
+  var copyFeedback = document.getElementById('copyFeedback');
+
+  function showFieldError(fieldId, msg) {
+    var input = document.getElementById(fieldId);
+    var errEl = document.getElementById('err-' + fieldId);
+    if (input) input.setAttribute('aria-invalid', msg ? 'true' : 'false');
+    if (errEl) errEl.textContent = msg || '';
+  }
+
+  function clearAllErrors() {
+    ['company', 'contactName', 'phone'].forEach(function (id) {
+      showFieldError(id, '');
+    });
+  }
 
   if (form) {
     form.addEventListener('submit', function (e) {
       e.preventDefault();
-      var btn = form.querySelector('.btn-submit');
-      btn.disabled = true;
-      btn.textContent = '提交中……';
+      clearAllErrors();
 
-      var data = {
-        company:  form.querySelector('#company').value.trim(),
-        contact:  form.querySelector('#contactName').value.trim(),
-        phone:    form.querySelector('#phone').value.trim(),
-        address:  form.querySelector('#address').value.trim()
-      };
+      var company = document.getElementById('company').value.trim();
+      var contact = document.getElementById('contactName').value.trim();
+      var phone = document.getElementById('phone').value.trim();
+      var address = document.getElementById('address').value.trim();
 
-      if (!data.company || !data.contact || !data.phone) {
-        alert('公司名称、联系人和手机号必填');
-        btn.disabled = false;
-        btn.textContent = '提交，30 分钟内回复';
+      var valid = true;
+
+      if (!company) {
+        showFieldError('company', '请填写公司名称');
+        valid = false;
+      }
+      if (!contact) {
+        showFieldError('contactName', '请填写联系人');
+        valid = false;
+      }
+      if (!phone) {
+        showFieldError('phone', '请填写手机号');
+        valid = false;
+      } else if (!/^1[3-9]\d{9}$/.test(phone)) {
+        showFieldError('phone', '手机号格式不对，请检查');
+        valid = false;
+      }
+
+      if (!valid) {
+        // focus first field with error
+        var firstErr = document.querySelector('[aria-invalid="true"]');
+        if (firstErr) firstErr.focus();
         return;
       }
 
-      if (!/^1[3-9]\d{9}$/.test(data.phone)) {
-        alert('手机号格式不对，检查一下');
-        btn.disabled = false;
-        btn.textContent = '提交，30 分钟内回复';
-        return;
-      }
+      // Compose the request text
+      var text = [
+        '【企业绿植方案需求】',
+        '公司：' + company,
+        '联系人：' + contact,
+        '手机：' + phone,
+        '地址/需求：' + (address || '未填'),
+        '生成时间：' + new Date().toLocaleString('zh-CN')
+      ].join('\n');
 
-      var title = '新询价：' + data.company;
-      var desp = [
-        '**公司**：' + data.company,
-        '**联系人**：' + data.contact,
-        '**手机**：' + data.phone,
-        '**地址/需求**：' + (data.address || '未填'),
-        '',
-        '---',
-        '[' + new Date().toLocaleString('zh-CN') + ']'
-      ].join('\n\n');
-
-      var url = 'https://sctapi.ftqq.com/' + SENDKEY + '.send';
-      fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: title, desp: desp })
-      })
-      .then(function (r) { return r.json(); })
-      .then(function (json) {
-        if (json.code === 0) {
-          form.style.display = 'none';
-          success.style.display = 'block';
-          success.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        } else {
-          throw new Error(json.info || '发送失败');
+      // Try clipboard first
+      var copied = false;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () {
+          copied = true;
+          showResult(text, true);
+        }).catch(function () {
+          showResult(text, false);
+        });
+      } else {
+        // Fallback for older browsers or no clipboard API
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        try {
+          document.execCommand('copy');
+          copied = true;
+        } catch (ex) {
+          copied = false;
         }
-      })
-      .catch(function () {
-        alert('网络不太稳定，提交失败。请直接致电 13368445881 或加微信。');
-        btn.disabled = false;
-        btn.textContent = '提交，30 分钟内回复';
+        document.body.removeChild(ta);
+        showResult(text, copied);
+      }
+    });
+  }
+
+  function showResult(text, copied) {
+    form.style.display = 'none';
+    formResult.hidden = false;
+    if (resultText) resultText.value = text;
+    formResult.focus();
+    if (btnCopy) {
+      btnCopy.onclick = function () {
+        if (resultText) {
+          resultText.select();
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(resultText.value).then(function () {
+              if (copyFeedback) copyFeedback.textContent = '已复制到剪贴板';
+            }).catch(function () {
+              if (copyFeedback) copyFeedback.textContent = '请手动选中文本框内容复制';
+            });
+          } else {
+            try {
+              document.execCommand('copy');
+              if (copyFeedback) copyFeedback.textContent = '已复制到剪贴板';
+            } catch (ex) {
+              if (copyFeedback) copyFeedback.textContent = '请手动选中文本框内容复制';
+            }
+          }
+        }
+      };
+    }
+    formResult.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    // Always open QR modal after generating
+    setTimeout(function () { openModal(); }, 400);
+  }
+
+  /* ==============================================
+     IntersectionObserver — fade-in reveal
+     ============================================== */
+  var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!reducedMotion) {
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
       });
+    }, { threshold: 0.15, rootMargin: '0px 0px -30px 0px' });
+
+    document.querySelectorAll('.reveal').forEach(function (el) {
+      observer.observe(el);
+    });
+  } else {
+    // Show all immediately if prefers reduced motion
+    document.querySelectorAll('.reveal').forEach(function (el) {
+      el.classList.add('visible');
     });
   }
 
-  // ===== WeChat Float + QR Modal =====
-  var floatBtn = document.getElementById('wxFloatBtn');
-  var floatTip = document.getElementById('wxFloatTip');
-  var qrModal  = document.getElementById('qrModal');
-  var qrClose  = document.getElementById('qrModalClose');
-  var qrMask   = qrModal ? qrModal.querySelector('.qr-modal-mask') : null;
-
-  if (floatBtn) {
-    setTimeout(function () { floatTip.classList.add('show'); }, 1200);
-    setTimeout(function () { floatTip.classList.remove('show'); }, 7000);
-
-    floatBtn.addEventListener('click', function () {
-      floatTip.classList.remove('show');
-      qrModal.classList.add('show');
-    });
-  }
-
-  if (floatTip) {
-    floatTip.addEventListener('click', function (e) {
-      e.stopPropagation();
-      floatTip.classList.remove('show');
-      qrModal.classList.add('show');
-    });
-  }
-
-  if (qrClose) qrClose.addEventListener('click', function () { qrModal.classList.remove('show'); });
-  if (qrMask)  qrMask.addEventListener('click',  function () { qrModal.classList.remove('show'); });
-
+  /* ==============================================
+     Smooth scroll for anchor links offset by header
+     ============================================== */
   document.addEventListener('click', function (e) {
-    var t = e.target.closest('a[href="weixin://"]');
-    if (t) { e.preventDefault(); qrModal.classList.add('show'); }
+    var link = e.target.closest('a[href^="#"]');
+    if (!link) return;
+    var targetId = link.getAttribute('href').slice(1);
+    if (!targetId) return;
+    var target = document.getElementById(targetId);
+    if (!target) return;
+
+    e.preventDefault();
+    var header = document.getElementById('header');
+    var offset = header ? header.offsetHeight + 8 : 8;
+    var top = target.getBoundingClientRect().top + window.pageYOffset - offset;
+    window.scrollTo({ top: top, behavior: reducedMotion ? 'auto' : 'smooth' });
   });
+
 })();
